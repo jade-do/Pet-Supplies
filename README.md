@@ -1,1 +1,99 @@
-{"cells":[{"source":"# Data Analyst Associate Practical Exam Submission\n\n**You can use any tool that you want to do your analysis and create visualizations. Use this template to write up your summary for submission.**\n\nYou can use any markdown formatting you wish. If you are not familiar with Markdown, read the [Markdown Guide](https://s3.amazonaws.com/talent-assets.datacamp.com/Markdown+Guide.pdf) before you start.\n\n","metadata":{"tags":[]},"id":"a5b3bc0e-b993-4ee3-bd07-825a474bd0d9","cell_type":"markdown"},{"source":"## Task 1\n\n","metadata":{"jp-MarkdownHeadingCollapsed":true,"tags":[]},"id":"d1b1a012-1ccb-40e7-a1ad-77b60b256690","cell_type":"markdown"},{"source":"## Data Validation\n\nThe original data is **1500** rows and **8** columns. No rows were removed during the data transformation process.\n\n**product_id**: \n- No missing values.\n\n**category**: \n- There were 6 categories as expected (Food, Housing, Medicina, Toys, Equipment, and Accessory). \n- However, missing values were indicated with **\"-\"** instead of **\"Unknown\"**. I therefore performed an SQL query to replace \"-\" with \"Unknown\" in the category column.\n\n**animal**: \n- There are 4 animal type as expected (Bird, Dog, Cat, Fish). There were no missing value in the table.\n\n**size**: \n- \tThere are 3 sizes as expected (Small, Medium, Large). There were no missing values. \n- \tHowever, the capitalization is inconsistent. To resolve this inconsistency, I use the INITCAP() function to capitalize the first letter only for all sizes.\n\n**price**: \n- \tMissing prices have a value of \"unlisted\". I calculated the **Median** of all listed prices using PERCENTILE_DISC(0.50) function, then replace all \"unlisted\" prices with the median price. \n- \tSome prices have none or only 1 decimal places. None of the prices have more than 2 decimal places. I used the ROUND(price::NUMERIC, 2) function to ensure every price has 2 decimal places. \n\n**sales**\n- \tThere were no missing sales value. Some sales value have none or only 1 decimal place. I used the ROUND(sales::NUMERIC, 2) function to ensure every price has 2 decimal places. \n\n**ratings**: \n- \tRatings are discrete values from 1 to 10, as expected.\n- \tMissing values were listed as \"NA\". I performed a SQL replace function to replace \"NA\" with \"0\"\n\n**repeat_purchase**:\n- \tSome repeate_purchase values are -0 instead of 0. These were fixed to be 0.\n- \tThere are only 2 nominal values, 0 and 1, as expected.\n- \tThere were null values in the repeat_purchase column","metadata":{"tags":[]},"id":"714a7083-7a43-4b0b-8ed4-2675efc87691","cell_type":"markdown"},{"source":"## Task 2","metadata":{},"id":"643d4c36-4183-4fbe-a263-6b9de60d29da","cell_type":"markdown"},{"source":"## Data Discovery and Visualization\n\n### Which category has the most repeat purchases?\n\nThere are seven possible product categories included in this data. The most common category that customers repeatedly purchase from is Equipment.\n\nThis would suggest that PetMind should focus on developing products from the Equipment category.\n\nThe 2nd, 3rd, 4th and 5th most common categories are Housing, Food, Medicine and Toys, respectively. They only have two thirds (2/3) as many instances of repeat purchases as the 1st most commont category, Equipment. However, observations are balanced and approximately the same across the 2nd, 3rd, 4th and 5th most common categories.\n\nIt is interesting to note that eventhough Toys are Luxury items, the Toys category has as many repeat purchases as the Food category, which is classified as Everyday items.\n\nAccessory seems to be perceived as a Luxury item by consumers, with only half as many repeat purchases as Housing, Food, Medicine and Toys.\n\n![category_total_repeat_purchase](category_total_repeat_purchase.png)\n","metadata":{},"id":"1d5ba38c-1b3a-4f9b-bf38-bb0a62dac346","cell_type":"markdown"},{"source":"## Task 3","metadata":{},"id":"ce5f6df2-fbf2-4c44-9209-9ee668876b53","cell_type":"markdown"},{"source":"### Describe the distribution of all sales across categories.\n\nAs PetMind wants to see how repeat purchase impacts sales, we should look at how sales is distributed. Looking at the total sales value per category, we can see that Equipment, which has the most repeat purchases, also have the highest total sales value. This indicates that increasing sales by selling more everyday product repeatedly might be an effective marketing strategy.\n\nHowever, we may also notice that Toys has the 2nd highest total sales value, followed closely by Food, with the 3rd highest total sales value. These are also product categories with higher number of repeated purchases.\n\nOverall, this trend indicates that increasing sales by selling products that have a high observation of repeated purchases is an effective marketing strategy.\n\n\n![category_total_sales](category_total_sales.png)\n","metadata":{},"id":"8fcff247-db49-42c0-8710-51848aeb6347","cell_type":"markdown"},{"source":"## Describe the Distribution of Sales in General\n\nAs PetMind is focusing on increasing sales, we should look at how sales are distributed. Looking at all sales, we can see that most products have  less than 1200 sales. There are some outliers that get more than 1600 sales, with some generate as high as 2200 sales, but this is relatively uncommon. When determining which product category to increase sales in, PetMind should focus on products in categories that have more than 1200 sales. Furthermore, the company should aim to identiy which category / categories generate unusally high sales (>1600).\n\n![distribution_of_sales](distribution_of_sales.png)\n","metadata":{},"cell_type":"markdown","id":"f282eca5-8ec9-4703-bdcf-3aaca5a05a4e"},{"source":"I performed an SQL query to see which categories have products that generate more than 1600 sales. The results are really surprising. Eventhough Equipment is the category with the highest observations of repeat purchases and highest total sales across all of its products, it only has 1 product that generates more than 1600 sales.\n\nIn contrast, eventhough Toys and Food have less repeat purchases and total sales revenue across all their products, they have more special products that generate unusually high sales values. PetMind may want to identify these high-sales products and develop a marketing strategy to sell more of these products specifically.\n![category_more_than_1600_sales](category_more_than_1600_sales.png)\n","metadata":{},"cell_type":"markdown","id":"ea4e2a01-f993-4164-bff4-2ed096f58400"},{"source":"## Task 4","metadata":{},"id":"c5fbe3a0-d277-437c-a1a0-f1edf80684f7","cell_type":"markdown"},{"source":"## Describe the relationship between repeat purchase and sales\n\nFinally we want to combine the two pieces of information to see how the number of repeat purchases impacts sales. So far categories with a higher number of repeat purchases generate more absolute sales value.\n\nThe correlation coefficient _r_ between the number of repeat purchases and sales is r = 0.8997, indicating a strong, positive linear relationship. The _p-value_ is p = 0.0058, indicating that the probability that the true value of _r_ is 0 (no correlation) is less than 0.6%, which is very highly unlikely. Therefore, we have significant statistics evident that categories with higher number of repeat purchase helps generate more sales.\n\nThe linear model **y = 1541.81x + 14002.83** helps describe this linear relationship.\n\nNonetheless, when looking at categories such as Toys, Food, Medicine and Housing, we see that the linear trend is not entirely applicable: It is difficult to use the linear model **y = 1541.81x + 14002.83**  to predict sales for any of those 4 categories based on their number of repeat purchases. We may need to investigate further to identify what drives the differences in sales between those 4 categories, despite their roughly similar number of repeat purchases.\n\n![repeat_purchase_sales](repeat_purchase_sales.png)\n\n","metadata":{},"id":"170dd2ea-340f-4ab4-94c8-fe077342e98e","cell_type":"markdown"},{"source":"## Conclusion\n\nBased on all of the above, we would recommend that PetMind focus on increasing sales by selling more products in the Equipment categories. \n\nThe company should also consider selling more Toys, a Luxury category, to generate more sales, instead of only Everyday items.\n\nFurther analysis should be done to understand why categories with roughly similar observations of repeat purchases may have significant differences in total sales value (Toys, Food, Medicine and Housing). The company may be able to research other hidden factors that drive salves, and develop new marketing strategies to increase sales based on those factors, instead of only on repeat purchases.","metadata":{},"cell_type":"markdown","id":"3c67611b-4140-4c84-a282-5f4a3baaa4db"},{"source":"## ✅ When you have finished...\n-  Publish your Workspace using the option on the left\n-  Check the published version of your report:\n\t-  Can you see everything you want us to grade?\n    -  Are all the graphics visible?\n-  Review the grading rubric. Have you included everything that will be graded?\n-  Head back to the [Certification Dashboard](https://app.datacamp.com/certification) to submit your practical exam","metadata":{"tags":[]},"id":"f635131a-00f8-44dd-b610-509db41c1154","cell_type":"markdown"}],"metadata":{"colab":{"name":"Welcome to DataCamp Workspaces.ipynb","provenance":[]},"kernelspec":{"display_name":"Python 3 (ipykernel)","language":"python","name":"python3"},"language_info":{"codemirror_mode":{"name":"ipython","version":3},"file_extension":".py","mimetype":"text/x-python","name":"python","nbconvert_exporter":"python","pygments_lexer":"ipython3","version":"3.8.10"}},"nbformat":4,"nbformat_minor":5}
+## Task 1
+
+## Data Validation
+
+The original data is **1500** rows and **8** columns. No rows were removed during the data transformation process.
+
+**product_id**: 
+- No missing values.
+
+**category**: 
+- There were 6 categories as expected (Food, Housing, Medicina, Toys, Equipment, and Accessory). 
+- However, missing values were indicated with **"-"** instead of **"Unknown"**. I therefore performed an SQL query to replace "-" with "Unknown" in the category column.
+
+**animal**: 
+- There are 4 animal type as expected (Bird, Dog, Cat, Fish). There were no missing value in the table.
+
+**size**: 
+- 	There are 3 sizes as expected (Small, Medium, Large). There were no missing values. 
+- 	However, the capitalization is inconsistent. To resolve this inconsistency, I use the INITCAP() function to capitalize the first letter only for all sizes.
+
+**price**: 
+- 	Missing prices have a value of "unlisted". I calculated the **Median** of all listed prices using PERCENTILE_DISC(0.50) function, then replace all "unlisted" prices with the median price. 
+- 	Some prices have none or only 1 decimal places. None of the prices have more than 2 decimal places. I used the ROUND(price::NUMERIC, 2) function to ensure every price has 2 decimal places. 
+
+**sales**
+- 	There were no missing sales value. Some sales value have none or only 1 decimal place. I used the ROUND(sales::NUMERIC, 2) function to ensure every price has 2 decimal places. 
+
+**ratings**: 
+- 	Ratings are discrete values from 1 to 10, as expected.
+- 	Missing values were listed as "NA". I performed a SQL replace function to replace "NA" with "0"
+
+**repeat_purchase**:
+- 	Some repeate_purchase values are -0 instead of 0. These were fixed to be 0.
+- 	There are only 2 nominal values, 0 and 1, as expected.
+- 	There were null values in the repeat_purchase column
+
+## Task 2
+
+## Data Discovery and Visualization
+
+### Which category has the most repeat purchases?
+
+There are seven possible product categories included in this data. The most common category that customers repeatedly purchase from is Equipment.
+
+This would suggest that PetMind should focus on developing products from the Equipment category.
+
+The 2nd, 3rd, 4th and 5th most common categories are Housing, Food, Medicine and Toys, respectively. They only have two thirds (2/3) as many instances of repeat purchases as the 1st most commont category, Equipment. However, observations are balanced and approximately the same across the 2nd, 3rd, 4th and 5th most common categories.
+
+It is interesting to note that eventhough Toys are Luxury items, the Toys category has as many repeat purchases as the Food category, which is classified as Everyday items.
+
+Accessory seems to be perceived as a Luxury item by consumers, with only half as many repeat purchases as Housing, Food, Medicine and Toys.
+
+![category_total_repeat_purchase](category_total_repeat_purchase.png)
+
+## Task 3
+
+### Describe the distribution of all sales across categories.
+
+As PetMind wants to see how repeat purchase impacts sales, we should look at how sales is distributed. Looking at the total sales value per category, we can see that Equipment, which has the most repeat purchases, also have the highest total sales value. This indicates that increasing sales by selling more everyday product repeatedly might be an effective marketing strategy.
+
+However, we may also notice that Toys has the 2nd highest total sales value, followed closely by Food, with the 3rd highest total sales value. These are also product categories with higher number of repeated purchases.
+
+Overall, this trend indicates that increasing sales by selling products that have a high observation of repeated purchases is an effective marketing strategy.
+
+
+![category_total_sales](category_total_sales.png)
+
+## Describe the Distribution of Sales in General
+
+As PetMind is focusing on increasing sales, we should look at how sales are distributed. Looking at all sales, we can see that most products have  less than 1200 sales. There are some outliers that get more than 1600 sales, with some generate as high as 2200 sales, but this is relatively uncommon. When determining which product category to increase sales in, PetMind should focus on products in categories that have more than 1200 sales. Furthermore, the company should aim to identiy which category / categories generate unusally high sales (>1600).
+
+![distribution_of_sales](distribution_of_sales.png)
+
+I performed an SQL query to see which categories have products that generate more than 1600 sales. The results are really surprising. Eventhough Equipment is the category with the highest observations of repeat purchases and highest total sales across all of its products, it only has 1 product that generates more than 1600 sales.
+
+In contrast, eventhough Toys and Food have less repeat purchases and total sales revenue across all their products, they have more special products that generate unusually high sales values. PetMind may want to identify these high-sales products and develop a marketing strategy to sell more of these products specifically.
+![category_more_than_1600_sales](category_more_than_1600_sales.png)
+
+## Task 4
+
+## Describe the relationship between repeat purchase and sales
+
+Finally we want to combine the two pieces of information to see how the number of repeat purchases impacts sales. So far categories with a higher number of repeat purchases generate more absolute sales value.
+
+The correlation coefficient _r_ between the number of repeat purchases and sales is r = 0.8997, indicating a strong, positive linear relationship. The _p-value_ is p = 0.0058, indicating that the probability that the true value of _r_ is 0 (no correlation) is less than 0.6%, which is very highly unlikely. Therefore, we have significant statistics evident that categories with higher number of repeat purchase helps generate more sales.
+
+The linear model **y = 1541.81x + 14002.83** helps describe this linear relationship.
+
+Nonetheless, when looking at categories such as Toys, Food, Medicine and Housing, we see that the linear trend is not entirely applicable: It is difficult to use the linear model **y = 1541.81x + 14002.83**  to predict sales for any of those 4 categories based on their number of repeat purchases. We may need to investigate further to identify what drives the differences in sales between those 4 categories, despite their roughly similar number of repeat purchases.
+
+![repeat_purchase_sales](repeat_purchase_sales.png)
+
+## Conclusion
+
+Based on all of the above, we would recommend that PetMind focus on increasing sales by selling more products in the Equipment categories. 
+
+The company should also consider selling more Toys, a Luxury category, to generate more sales, instead of only Everyday items.
+
+Further analysis should be done to understand why categories with roughly similar observations of repeat purchases may have significant differences in total sales value (Toys, Food, Medicine and Housing). The company may be able to research other hidden factors that drive salves, and develop new marketing strategies to increase sales based on those factors, instead of only on repeat purchases.
